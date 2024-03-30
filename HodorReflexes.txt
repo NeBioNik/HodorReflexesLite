@@ -23,28 +23,6 @@ extensions/hud.lua
 
 HodorReflexesMenu.lua
 
-users/misc/misc.lua
-users/misc2/misc2.lua
-users/misc3/misc3.lua
-users/misc4/misc4.lua
-users/misc5/misc5.lua
-users/misc6/misc6.lua
-users/hodor/hodor.lua
-users/frenchkiss/frenchkiss.lua
-users/chainreaction/chainreaction.lua
-users/ua/ua.lua
-users/mc/mc.lua
-users/luck/luck.lua
-users/vok/vok.lua
-users/equinoxe/equinoxe.lua
-users/pushdeeps/pushdeeps.lua
-users/cfm/cfm.lua
-users/mot/mot.lua
-users/moo/moo.lua
-
-users/integritycheck.xml
-users/integritycheck.lua
-
 modules/share/main.lua
 modules/share/menu.lua
 modules/share/menu_icons.lua
