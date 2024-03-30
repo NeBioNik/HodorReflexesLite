@@ -645,30 +645,6 @@ function M.Initialize()
 	SV = M.sv
 	SW = M.sw
 
-	-- Load user icon, if he has one.
-	local userId = GetUnitDisplayName('player')
-	local userIcon = player.GetIconForUserId(userId)
-	HodorReflexes_Updated_Icon5:SetTextureCoords(0, 1, 0, 1)
-	if HR.anim.RegisterUser(userId) then
-		HR.anim.RegisterUserControl(userId, HodorReflexes_Updated_Icon5)
-		HR.anim.RunUserAnimations(userId)
-	elseif userIcon then
-		HodorReflexes_Updated_Icon5:SetTexture(userIcon)
-	end
-
-	-- Show version update window and notify player if his icon is missing.
-	zo_callLater(function()
-		if not HodorReflexes_Updated_Icon5:IsTextureLoaded() then
-			d(strformat("|cFF6600%s|r", GetString(HR_MISSING_ICON)))
-		end
-		-- Version update window.
-		if SW.lastIconsVersion ~= HR.version then
-			SW.lastIconsVersion = HR.version
-			PlaySound(SOUNDS.BOOK_COLLECTION_COMPLETED)
-			HodorReflexes_Updated:SetHidden(false)
-		end
-	end, 1000)
-
 	-- Set default values for custom name and color.
 	if not IsValidString(SW.myIconPathFull) then
 		SW.myIconPathFull = userIcon or 'HodorReflexes/esologo.dds'
