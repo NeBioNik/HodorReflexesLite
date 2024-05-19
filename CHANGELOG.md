@@ -1,3 +1,13 @@
+## 2024.XX.XX - @m00nyONE
+- add integrity check to icon menu in the addon settings
+- slightly rework integrity check
+- add hide option for misc ultimates in combat. ( same options as for the dps list )
+
+## 2024.04.23 - @m00nyONE
+- add @seadotarley to the addon author/credit list
+- icon update
+- reminder: I'm always open for contributions and ideas: https://github.com/m00nyONE/HodorReflexes
+
 ## 2024.03.10 - @m00nyONE
 - the 999k damage bug should be fixed ( at least it should happen way less frequently ) ... Sadly it's impossible to "really" fix this issue as it's about the precision of the map pings being inconsistent in the ESO API.
 - icon update
