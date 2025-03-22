@@ -7,6 +7,8 @@ on:
   push:
     branches:
       - main
+      - dev
+      - lite
 
 jobs:
   release:
@@ -32,8 +34,8 @@ jobs:
 
       - name: Replace placeholders with current date
         run: |
-          sed -i "s/version = \"dev\"/version = \"${{ env.BUILD_DATE_WITH_DOT }}-dev\"/g" HodorReflexes.lua
-          sed -i "s/## Version: dev/## Version: ${{ env.BUILD_DATE_WITH_DOT }}-dev/g" HodorReflexes.addon
+          sed -i "s/version = \"dev\"/version = \"${{ env.BUILD_DATE_WITH_DOT }}-${{ github.ref_name }}\"/g" HodorReflexes.lua
+          sed -i "s/## Version: dev/## Version: ${{ env.BUILD_DATE_WITH_DOT }}-${{ github.ref_name }}/g" HodorReflexes.addon
           sed -i "s/## AddOnVersion: 99999999/## AddOnVersion: ${{ env.BUILD_DATE_NUMBER }}/g" HodorReflexes.addon
 
       - name: Create ZIP archive
@@ -43,15 +45,15 @@ jobs:
           cp -r ./* /tmp/HodorReflexes
           rm -rf /tmp/HodorReflexes/{.git,.github,.gitignore}
           cd /tmp
-          zip -r "$REPO_FOLDER/HodorReflexes-${{ env.BUILD_DATE_WITH_HYPHEN }}-dev.zip" ./HodorReflexes -x "*.git*" "*.github*" ".gitignore" "TODO.md" "config.ld"
+          zip -r "$REPO_FOLDER/HodorReflexes-${{ env.BUILD_DATE_WITH_HYPHEN }}-${{ github.ref_name }}.zip" ./HodorReflexes -x "*.git*" "*.github*" ".gitignore" "TODO.md" "config.ld"
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          name: "${{ env.BUILD_DATE_WITH_DOT }}-dev"
+          name: "${{ env.BUILD_DATE_WITH_DOT }}-${{ github.ref_name }}"
           commit: ${{ github.ref }}
-          tag: "${{ env.BUILD_DATE_WITH_DOT }}-dev"
-          artifacts: "HodorReflexes-${{ env.BUILD_DATE_WITH_HYPHEN }}-dev.zip"
+          tag: "${{ env.BUILD_DATE_WITH_DOT }}-${{ github.ref_name }}"
+          artifacts: "HodorReflexes-${{ env.BUILD_DATE_WITH_HYPHEN }}-${{ github.ref_name }}.zip"
           artifactContentType: application/zip
           bodyFile: CHANGELOG.md
           allowUpdates: true
