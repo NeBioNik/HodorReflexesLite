@@ -30,20 +30,37 @@ jobs:
           echo "BUILD_DATE_WITH_DOT=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
           echo "BUILD_DATE_WITH_HYPHEN=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
+      - name: Get addon variables
+        run: |
+          addon_name="HodorReflexes"
+          
+          echo "ADDON_NAME=$addon_name" >> $GITHUB_ENV
+          echo "ZIP_FULL_NAME=$addon_name-${{ env.BUILD_DATE_WITH_HYPHEN }}.zip" >> $GITHUB_ENV
+
       - name: Replace placeholders with current date
         run: |
-          sed -i "s/version = \"dev\"/version = \"${{ env.BUILD_DATE_WITH_DOT }}\"/g" HodorReflexes.lua
-          sed -i "s/## Version: dev/## Version: ${{ env.BUILD_DATE_WITH_DOT }}/g" HodorReflexes.addon
-          sed -i "s/## AddOnVersion: 99999999/## AddOnVersion: ${{ env.BUILD_DATE_NUMBER }}/g" HodorReflexes.addon
+          sed -i "s/version = \"dev\"/version = \"${{ env.BUILD_DATE_WITH_DOT }}\"/g" ${{ env.ADDON_NAME }}.lua
+          sed -i "s/## Version: dev/## Version: ${{ env.BUILD_DATE_WITH_DOT }}/g" ${{ env.ADDON_NAME }}.addon
+          sed -i "s/## AddOnVersion: 99999999/## AddOnVersion: ${{ env.BUILD_DATE_NUMBER }}/g" ${{ env.ADDON_NAME }}.addon
 
       - name: Create ZIP archive
         run: |
           REPO_FOLDER=$(pwd)
-          mkdir -p /tmp/HodorReflexes
-          cp -r ./* /tmp/HodorReflexes
-          rm -rf /tmp/HodorReflexes/{.git,.github,.gitignore}
-          cd /tmp
-          zip -r "$REPO_FOLDER/HodorReflexes-${{ env.BUILD_DATE_WITH_HYPHEN }}.zip" ./HodorReflexes -x "*.git*" "*.github*" ".gitignore" "TODO.md" "config.ld"
+          TMP_FOLDER="/tmp/${{ env.ADDON_NAME }}"
+          
+          # Make folder and copy content
+          mkdir -p $TMP_FOLDER
+          
+          rsync -a --quiet \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.gitignore' \
+            --exclude='TODO.md' \
+            --exclude='config.ld' \
+            "$REPO_FOLDER/" "$TMP_FOLDER/"
+          
+          # Make full version zip
+          (cd /tmp && zip -r --quiet "$REPO_FOLDER/${{ env.ZIP_FULL_NAME }}" "${{ env.ADDON_NAME }}")
 
       - name: Extract latest changelog entry
         run: |
@@ -56,7 +73,7 @@ jobs:
           name: "${{ env.BUILD_DATE_WITH_DOT }}"
           commit: ${{ github.ref }}
           tag: "${{ env.BUILD_DATE_WITH_DOT }}"
-          artifacts: "HodorReflexes-${{ env.BUILD_DATE_WITH_HYPHEN }}.zip"
+          artifacts: "${{ env.ZIP_FULL_NAME }}"
           artifactContentType: application/zip
           bodyFile: latest_changes.md
           allowUpdates: true
@@ -71,6 +88,6 @@ jobs:
             -H "x-api-token: $ESOUI_API_KEY" \
             -F "id=${ADDON_ID}" \
             -F "version=${{ env.BUILD_DATE_WITH_DOT }}" \
-            -F "updatefile=@HodorReflexes-${{ env.BUILD_DATE_WITH_HYPHEN }}.zip" \
+            -F "updatefile=@${{ env.ZIP_FULL_NAME }}" \
             -F "changelog=$(cat CHANGELOG.md)" \
             https://api.esoui.com/addons/update
