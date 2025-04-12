@@ -36,6 +36,7 @@ jobs:
           
           echo "ADDON_NAME=$addon_name" >> $GITHUB_ENV
           echo "ZIP_FULL_NAME=$addon_name-${{ env.BUILD_DATE_WITH_HYPHEN }}.zip" >> $GITHUB_ENV
+          echo "ZIP_LITE_NAME=$addon_name-${{ env.BUILD_DATE_WITH_HYPHEN }}-lite.zip" >> $GITHUB_ENV
 
       - name: Replace placeholders with current date
         run: |
@@ -61,6 +62,14 @@ jobs:
           
           # Make full version zip
           (cd /tmp && zip -r --quiet "$REPO_FOLDER/${{ env.ZIP_FULL_NAME }}" "${{ env.ADDON_NAME }}")
+          
+          # Make lite version. Remove custom users icons
+          rm -rf $TMP_FOLDER/users
+          sed -i '/^users\//d' $TMP_FOLDER/${{ env.ADDON_NAME }}.addon
+          sed -i "s/liteVersion = false/liteVersion = true/g" $TMP_FOLDER/${{ env.ADDON_NAME }}.lua
+          
+          # Make lite version zip
+          (cd /tmp && zip -r --quiet "$REPO_FOLDER/${{ env.ZIP_LITE_NAME }}" "${{ env.ADDON_NAME }}")
 
       - name: Extract latest changelog entry
         run: |
@@ -73,7 +82,7 @@ jobs:
           name: "${{ env.BUILD_DATE_WITH_DOT }}"
           commit: ${{ github.ref }}
           tag: "${{ env.BUILD_DATE_WITH_DOT }}"
-          artifacts: "${{ env.ZIP_FULL_NAME }}"
+          artifacts: "${{ env.ZIP_FULL_NAME }}, ${{ env.ZIP_LITE_NAME }}"
           artifactContentType: application/zip
           bodyFile: latest_changes.md
           allowUpdates: true
